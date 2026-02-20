@@ -3,17 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blora Social Feed Monitor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>BLORA_SOCIAL_MONITOR</title>
     <style>
-        /* Font Face Local Fallback */
-        @font-face {
-            font-family: 'Fira Code';
-            src: local('Consolas'), local('Monaco'), local('Courier New');
-            font-weight: 300 600;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -21,855 +12,807 @@
         }
         
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --border: #e0e0e0;
-            --accent: #333333;
-            --kritik: #000000;
-            --apresiasi: #333333;
+            --bg: #ffffff;
+            --text: #111111;
+            --border: #000000;
+            --muted: #555555;
+            --hover: #f5f5f5;
+            --accent: #0066cc;
         }
         
         body {
-            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
+            font-size: 15px;
+            font-weight: 400;
         }
         
-        /* Header Animation */
-        header {
-            background: var(--bg-primary);
-            border-bottom: 2px solid var(--border);
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
+        /* HEADER */
+        .header {
+            border-bottom: 3px solid var(--border);
+            padding: 2.5rem 2rem;
+            background: var(--bg);
         }
         
-        .header-content {
-            max-width: 1200px;
+        .container {
+            max-width: 1400px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
+            padding: 0 2rem;
         }
         
-        .location-badge {
-            display: inline-block;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
+        .location {
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 1rem;
-            animation: slideIn 0.8s ease-out;
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+            font-weight: 600;
         }
         
         h1 {
-            font-size: 2.5rem;
-            font-weight: 600;
+            font-size: 36px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
             margin-bottom: 0.5rem;
-            animation: typewriter 1.5s steps(30) 0.5s both;
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid var(--text-primary);
+            color: var(--border);
         }
         
         .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            animation: fadeIn 1s ease-out 2s both;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 500;
         }
         
-        /* Stats Bar */
-        .stats-bar {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem;
+        /* STATS BAR */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            border-bottom: 2px solid var(--border);
+            background: var(--bg);
         }
         
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .stat-item {
+        .stat-box {
+            padding: 1.5rem 1rem;
             text-align: center;
-            animation: slideUp 0.6s ease-out;
+            border-right: 1px solid var(--border);
+        }
+        
+        .stat-box:last-child {
+            border-right: none;
         }
         
         .stat-number {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 800;
             display: block;
+            margin-bottom: 0.25rem;
+            color: var(--border);
         }
         
         .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-size: 11px;
             text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            font-weight: 700;
         }
         
-        /* Controls */
+        /* CONTROLS */
         .controls {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--border);
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
-        .filter-group {
+        .btn-group {
             display: flex;
-            gap: 0.5rem;
+            gap: 0;
         }
         
         .btn {
-            background: transparent;
-            border: 2px solid var(--text-primary);
-            color: var(--text-primary);
-            padding: 0.75rem 1.5rem;
-            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.85rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 0.875rem 1.75rem;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-left: -2px;
+            transition: all 0.15s;
+        }
+        
+        .btn:first-child {
+            margin-left: 0;
         }
         
         .btn:hover, .btn.active {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            background: var(--text);
+            color: var(--bg);
         }
         
-        .refresh-btn {
+        .refresh-section {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .refresh-btn.spinning .icon {
-            animation: spin 1s linear infinite;
-        }
-        
-        .next-update {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-left: 1rem;
-        }
-        
-        /* Feed Grid */
-        .feed-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem 3rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1.5rem;
         }
         
-        .feed-card {
-            background: var(--bg-primary);
-            border: 2px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.6s ease-out;
+        .timer {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
         }
         
-        .feed-card::before {
+        /* SOURCE TABS */
+        .source-tabs {
+            background: var(--bg);
+            border-bottom: 2px solid var(--border);
+            padding: 0 2rem;
+        }
+        
+        .tabs-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            border: none;
+            background: none;
+            border-right: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            position: relative;
+        }
+        
+        .tab:first-child {
+            border-left: 1px solid var(--border);
+        }
+        
+        .tab:hover {
+            color: var(--text);
+        }
+        
+        .tab.active {
+            color: var(--text);
+            background: var(--hover);
+        }
+        
+        .tab.active::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: -2px;
             left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--text-primary);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+            right: 0;
+            height: 3px;
+            background: var(--border);
         }
         
-        .feed-card:hover::before {
-            transform: scaleY(1);
+        .tab-count {
+            display: inline-block;
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.125rem 0.5rem;
+            font-size: 11px;
+            margin-left: 0.5rem;
+            font-weight: 800;
+        }
+        
+        /* FEED GRID */
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: var(--border);
+            min-height: 600px;
+        }
+        
+        .feed-card {
+            background: var(--bg);
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.15s;
+            position: relative;
         }
         
         .feed-card:hover {
-            transform: translateX(5px);
-            box-shadow: -5px 5px 0px rgba(0,0,0,0.1);
-            border-color: var(--text-primary);
+            background: var(--hover);
         }
         
-        .feed-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
         }
         
-        .platform-icon {
-            font-size: 1.2rem;
-            font-weight: bold;
+        .source-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        .category-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.7rem;
+        .platform {
+            font-weight: 800;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border: 1px solid;
-            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            background: var(--text);
+            color: var(--bg);
         }
         
-        .category-kritik {
-            color: var(--kritik);
-            border-color: var(--kritik);
+        .platform.media {
+            background: var(--accent);
         }
         
-        .category-apresiasi {
-            color: var(--apresiasi);
-            border-color: var(--apresiasi);
+        .category {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0.375rem 0.875rem;
+            border: 2px solid var(--border);
+            font-weight: 800;
         }
         
-        .feed-content {
-            margin-bottom: 1rem;
-            line-height: 1.8;
-            font-size: 0.95rem;
+        .category.kritik {
+            background: var(--text);
+            color: var(--bg);
         }
         
-        .feed-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border);
-            padding-top: 1rem;
-        }
-        
-        .author {
+        .content {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
             font-weight: 500;
         }
         
-        .timestamp {
-            font-size: 0.75rem;
+        .card-footer {
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .meta {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-detail {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .engagement {
             display: flex;
-            gap: 1rem;
+            gap: 1.25rem;
+            font-weight: 700;
+            font-size: 13px;
         }
         
-        .engagement-item {
+        .engagement span {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.375rem;
         }
         
-        /* Loading Animation */
+        /* MEDIA SOURCE LABEL */
+        .media-source {
+            display: inline-block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            font-weight: 800;
+            margin-top: 0.5rem;
+        }
+        
+        /* LOADING */
         .loading {
-            text-align: center;
-            padding: 3rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
             grid-column: 1 / -1;
-        }
-        
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-        
-        /* Empty State */
-        .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
-            grid-column: 1 / -1;
+            padding: 4rem;
+            background: var(--bg);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
         }
         
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-        
-        /* Update Notification */
-        .update-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            padding: 1rem 1.5rem;
-            border: 2px solid var(--text-primary);
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
-            font-size: 0.85rem;
-            z-index: 1000;
-            animation: slideInRight 0.5s ease-out;
-            display: none;
-        }
-        
-        .update-notification.show {
-            display: block;
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--bg-secondary);
+        /* FOOTER */
+        .footer {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
             border-top: 2px solid var(--border);
-            padding: 2rem 1rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            margin-top: 2px;
         }
         
-        /* Animations */
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeInUp {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .feed-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
-        @keyframes slideUp {
-            from { 
-                opacity: 0; 
-                transform: translateY(10px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
-        
-        /* Responsive */
         @media (max-width: 768px) {
-            h1 { font-size: 1.5rem; }
-            .feed-container { grid-template-columns: 1fr; }
-            .controls { flex-direction: column; align-items: stretch; }
-            .filter-group { justify-content: center; }
-            .next-update { margin-left: 0; margin-top: 0.5rem; text-align: center; }
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--text-secondary);
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-primary);
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-box:nth-child(2), .stat-box:nth-child(4) {
+                border-right: none;
+            }
+            .stat-box {
+                border-bottom: 1px solid var(--border);
+            }
+            .feed-grid {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .tabs-container {
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="update-notification" id="updateNotification">
-        Data diperbarui! [15 menit lagi]
-    </div>
 
-    <header>
-        <div class="header-content">
-            <div class="location-badge">Kabupaten Blora, Jawa Tengah, Indonesia</div>
-            <h1>Social_Feed_Monitor_v1.0</h1>
-            <p class="subtitle">// Monitoring kritik dan apresiasi masyarakat dari platform sosial media</p>
+    <header class="header">
+        <div class="container">
+            <div class="location">Kabupaten Blora, Jawa Tengah, Indonesia</div>
+            <h1>BLORA_SOCIAL_MONITOR</h1>
+            <div class="subtitle">Sistem Monitoring Kritik, Apresiasi & Liputan Media</div>
         </div>
     </header>
-    
-    <div class="stats-bar">
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-number" id="totalFeed">0</span>
-                <span class="stat-label">Total Feed</span>
+
+    <div class="stats">
+        <div class="stat-box">
+            <span class="stat-number" id="totalFeed">0</span>
+            <span class="stat-label">Total Feed</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number" id="totalKritik">0</span>
+            <span class="stat-label">Kritik</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number" id="totalApresiasi">0</span>
+            <span class="stat-label">Apresiasi</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number" id="totalMedia">0</span>
+            <span class="stat-label">Media</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number" id="lastUpdate">--:--</span>
+            <span class="stat-label">Last Update</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn active" onclick="filterCategory('all', this)">[Semua]</button>
+                <button class="btn" onclick="filterCategory('kritik', this)">[Kritik]</button>
+                <button class="btn" onclick="filterCategory('apresiasi', this)">[Apresiasi]</button>
             </div>
-            <div class="stat-item">
-                <span class="stat-number" id="totalKritik">0</span>
-                <span class="stat-label">Kritik</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number" id="totalApresiasi">0</span>
-                <span class="stat-label">Apresiasi</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number" id="lastUpdate">--:--</span>
-                <span class="stat-label">Last Update</span>
+            <div class="refresh-section">
+                <span class="timer" id="timer">NEXT: 15:00</span>
+                <button class="btn" onclick="refreshData()">[Refresh]</button>
             </div>
         </div>
     </div>
-    
-    <div class="controls">
-        <div class="filter-group">
-            <button class="btn active" onclick="filterFeed('all', this)">[Semua]</button>
-            <button class="btn" onclick="filterFeed('kritik', this)">[Kritik]</button>
-            <button class="btn" onclick="filterFeed('apresiasi', this)">[Apresiasi]</button>
-        </div>
-        <div style="display: flex; align-items: center; flex-wrap: wrap;">
-            <button class="btn refresh-btn" onclick="manualRefresh()">
-                <span class="icon">*</span>
-                <span>Refresh_Data()</span>
+
+    <div class="source-tabs">
+        <div class="tabs-container">
+            <button class="tab active" onclick="filterSource('all', this)">
+                Semua Sumber <span class="tab-count" id="countAll">0</span>
             </button>
-            <span class="next-update" id="nextUpdate">Next: 15:00</span>
+            <button class="tab" onclick="filterSource('social', this)">
+                Sosial Media <span class="tab-count" id="countSocial">0</span>
+            </button>
+            <button class="tab" onclick="filterSource('media', this)">
+                Media Lokal <span class="tab-count" id="countMedia">0</span>
+            </button>
         </div>
     </div>
-    
-    <div class="feed-container" id="feedContainer">
-        <div class="loading">Memuat data feed dari Blora</div>
+
+    <div class="feed-grid" id="feedGrid">
+        <div class="loading">Memuat data...</div>
     </div>
-    
-    <footer>
-        <p>// Sistem monitoring ini mengumpulkan data publik dari X, Instagram, TikTok, dan Facebook</p>
-        <p>Dikembangkan untuk Kabupaten Blora | <span id="year"></span></p>
+
+    <footer class="footer">
+        Data Sources: X, Instagram, TikTok, Facebook, BloraTV, RadarBlora, BloraOnline<br>
+        Update Interval: 15 Menit | Dikembangkan untuk Kabupaten Blora
     </footer>
 
     <script>
-        // Data Feed Dummy untuk Demo - Realistis untuk Blora
-        const dummyData = [
+        // DATA FEED - 15 ITEMS (Social + Media)
+        const feedData = [
+            // SOSIAL MEDIA - KRITIK
             {
                 id: 1,
+                source: 'social',
                 platform: 'X',
                 category: 'kritik',
-                content: 'Jalan raya Blora-Cepu banyak lubang, sudah berbulan-bulan tidak diperbaiki. Bahaya untuk pengendara motor. Mohon perhatiannya @PemkabBlora #Blora',
+                content: 'Jalan raya Blora-Cepu banyak lubang parah, sudah 3 bulan tidak diperbaiki. Sangat berbahaya untuk pengendara motor malam hari.',
                 author: 'warga_blora',
-                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                time: '2j lalu',
                 likes: 45,
                 shares: 23,
                 location: 'Jl. Raya Blora-Cepu'
             },
             {
                 id: 2,
-                platform: 'Instagram',
-                category: 'apresiasi',
-                content: 'Alhamdulillah pasar tradisional Jepon sudah direnovasi, jadi lebih bersih dan nyaman. Terima kasih Pak Bupati! #BloraHebat',
-                author: 'jepon_makmur',
-                timestamp: new Date(Date.now() - 7200000).toISOString(),
-                likes: 234,
-                shares: 45,
-                location: 'Pasar Jepon'
-            },
-            {
-                id: 3,
-                platform: 'Facebook',
+                source: 'social',
+                platform: 'FB',
                 category: 'kritik',
-                content: 'Sampah di sungai Bengawan Solo sekitar Randublatung menggunung. Pembersihan tidak rutin. Ini mengganggu kesehatan lingkungan.',
-                author: 'Peduli Blora',
-                timestamp: new Date(Date.now() - 10800000).toISOString(),
+                content: 'Sampah di sungai Bengawan Solo sekitar Randublatung menggunung. Pembersihan tidak rutin, bau tidak sedap mengganggu warga.',
+                author: 'Peduli_Blora',
+                time: '5j lalu',
                 likes: 67,
                 shares: 89,
                 location: 'Randublatung'
             },
             {
+                id: 3,
+                source: 'social',
+                platform: 'X',
+                category: 'kritik',
+                content: 'Pelayanan di Dukcapil Blora masih lambat. Antrian panjang padahal sudah online. Sistem perlu diperbaiki segera.',
+                author: 'antrian_blora',
+                time: '4j lalu',
+                likes: 34,
+                shares: 12,
+                location: 'Kantor Dukcapil'
+            },
+            {
                 id: 4,
-                platform: 'TikTok',
+                source: 'social',
+                platform: 'X',
+                category: 'kritik',
+                content: 'Lampu jalan di Jl. Pemuda Blora banyak yang mati. Jadi gelap dan rawan kecelakaan. Perlu perbaikan segera.',
+                author: 'pemuda_blora',
+                time: '7j lalu',
+                likes: 89,
+                shares: 34,
+                location: 'Jl. Pemuda'
+            },
+            {
+                id: 5,
+                source: 'social',
+                platform: 'FB',
+                category: 'kritik',
+                content: 'Ketersediaan air bersih di Kecamatan Todanan masih bermasalah. PDAM sering mati tanpa pemberitahuan.',
+                author: 'Warga_Todanan',
+                time: '8j lalu',
+                likes: 123,
+                shares: 56,
+                location: 'Todanan'
+            },
+            
+            // SOSIAL MEDIA - APRESIASI
+            {
+                id: 6,
+                source: 'social',
+                platform: 'IG',
                 category: 'apresiasi',
-                content: 'Festival Blora 2026 keren banget! Ada wayang kulit, pameran UKM, dan konser dangdut. Bangga jadi warga Blora!',
+                content: 'Alhamdulillah pasar tradisional Jepon sudah direnovasi total, jadi lebih bersih dan nyaman. Terima kasih Pemkab Blora!',
+                author: 'jepon_makmur',
+                time: '3j lalu',
+                likes: 234,
+                shares: 45,
+                location: 'Pasar Jepon'
+            },
+            {
+                id: 7,
+                source: 'social',
+                platform: 'TT',
+                category: 'apresiasi',
+                content: 'Festival Blora 2026 luar biasa! Ada wayang kulit, pameran UKM, dan konser dangdut. Bangga jadi warga Blora!',
                 author: 'blora_culture',
-                timestamp: new Date(Date.now() - 14400000).toISOString(),
+                time: '1j lalu',
                 likes: 1205,
                 shares: 340,
                 location: 'Alun-alun Blora'
             },
             {
-                id: 5,
-                platform: 'X',
-                category: 'kritik',
-                content: 'Pelayanan di Dukcapil Blora masih lambat. Antrian panjang padahal sudah online. Sistem perlu diperbaiki.',
-                author: 'antrian_blora',
-                timestamp: new Date(Date.now() - 18000000).toISOString(),
-                likes: 34,
-                shares: 12,
-                location: 'Kantor Dukcapil Blora'
-            },
-            {
-                id: 6,
-                platform: 'Instagram',
+                id: 8,
+                source: 'social',
+                platform: 'IG',
                 category: 'apresiasi',
                 content: 'Taman Kota Blora malam ini indah sekali. Lampu-lampu baru terpasang rapi. Cocok untuk keluarga berwisata malam.',
                 author: 'blora_night',
-                timestamp: new Date(Date.now() - 21600000).toISOString(),
+                time: '6j lalu',
                 likes: 456,
                 shares: 78,
-                location: 'Taman Kota Blora'
+                location: 'Taman Kota'
             },
             {
-                id: 7,
-                platform: 'Facebook',
-                category: 'kritik',
-                content: 'Ketersediaan air bersih di Kecamatan Todanan masih bermasalah. PDAM sering mati tanpa pemberitahuan. Mohon solusinya.',
-                author: 'Warga Todanan',
-                timestamp: new Date(Date.now() - 25200000).toISOString(),
-                likes: 123,
-                shares: 56,
-                location: 'Todanan'
-            },
-            {
-                id: 8,
-                platform: 'TikTok',
+                id: 9,
+                source: 'social',
+                platform: 'TT',
                 category: 'apresiasi',
                 content: 'SMK Negeri 1 Blora juara robotik tingkat nasional! Prestasi membanggakan untuk pendidikan vokasi di Blora.',
                 author: 'smkn1_blora',
-                timestamp: new Date(Date.now() - 28800000).toISOString(),
+                time: '30m lalu',
                 likes: 3400,
                 shares: 890,
                 location: 'SMKN 1 Blora'
             },
             {
-                id: 9,
-                platform: 'X',
-                category: 'kritik',
-                content: 'Lampu jalan di Jl. Pemuda Blora banyak yang mati. Jadi gelap dan rawan kecelakaan. Perlu perbaikan segera.',
-                author: 'pemuda_blora',
-                timestamp: new Date(Date.now() - 32400000).toISOString(),
-                likes: 89,
-                shares: 34,
-                location: 'Jl. Pemuda, Blora'
-            },
-            {
                 id: 10,
-                platform: 'Instagram',
+                source: 'social',
+                platform: 'IG',
                 category: 'apresiasi',
-                content: 'Sentra kerajinan batik Blora semakin berkembang. Kualitas bagus dan harga terjangkau. Dukung UMKM lokal!',
+                content: 'Sentra kerajinan batik Blora semakin berkembang pesat. Kualitas bagus dan harga terjangkau. Dukung UMKM lokal!',
                 author: 'batik_blora',
-                timestamp: new Date(Date.now() - 36000000).toISOString(),
+                time: '5j lalu',
                 likes: 567,
                 shares: 123,
                 location: 'Sentra Batik Blora'
             },
+            
+            // MEDIA LOKAL - LIPUTAN
             {
                 id: 11,
-                platform: 'Facebook',
-                category: 'kritik',
-                content: 'Jembatan di Desa Jiken rusak parah. Warga harus memutar jauh untuk ke kecamatan. Butuh perhatian pemerintah.',
-                author: 'Jiken_Bangkit',
-                timestamp: new Date(Date.now() - 40000000).toISOString(),
-                likes: 156,
+                source: 'media',
+                platform: 'BloraTV',
+                category: 'media',
+                content: 'Bupati Blora resmikan jembatan baru di Desa Jiken yang menelan anggaran Rp 12 Miliar. Akses warga ke pusat kecamatan kini lebih mudah.',
+                author: 'BloraTV',
+                time: '1j lalu',
+                likes: 567,
                 shares: 234,
-                location: 'Desa Jiken'
+                location: 'Desa Jiken',
+                url: 'https://bloratv.id/berita/jembatan-jiken'
             },
             {
                 id: 12,
-                platform: 'TikTok',
-                category: 'apresiasi',
-                content: 'Pemandian air panas Cepu ramai pengunjung! Fasilitasnya bersih dan harga tiket terjangkau. Wisata Blora memang oke.',
-                author: 'wisata_blora',
-                timestamp: new Date(Date.now() - 43200000).toISOString(),
+                source: 'media',
+                platform: 'RadarBlora',
+                category: 'media',
+                content: 'Dinas PUPR Blora mulai perbaiki jalan rusak di 5 kecamatan. Pengerjaan ditargetkan selesai sebelum Lebaran 2026.',
+                author: 'RadarBlora',
+                time: '3j lalu',
+                likes: 345,
+                shares: 189,
+                location: 'Blora',
+                url: 'https://radarblora.co.id/perbaikan-jalan'
+            },
+            {
+                id: 13,
+                source: 'media',
+                platform: 'BloraOnline',
+                category: 'media',
+                content: 'Ratusan pelajar SMK di Blora mengikuti pelatihan kewirausahaan digital. Program Pemkab untuk cetak pengusaha muda.',
+                author: 'BloraOnline',
+                time: '5j lalu',
+                likes: 234,
+                shares: 145,
+                location: 'Aula Pemkab Blora',
+                url: 'https://bloraonline.com/pelatihan-smk'
+            },
+            {
+                id: 14,
+                source: 'media',
+                platform: 'BloraTV',
+                category: 'media',
+                content: 'Pasar rakyat di Kecamatan Cepu kebakaran hebat siang tadi. Tidak ada korban jiwa, kerugian ditaksir Rp 500 juta.',
+                author: 'BloraTV',
+                time: '30m lalu',
                 likes: 890,
+                shares: 567,
+                location: 'Cepu',
+                url: 'https://bloratv.id/berita/kebakaran-cepu'
+            },
+            {
+                id: 15,
+                source: 'media',
+                platform: 'RadarBlora',
+                category: 'media',
+                content: 'Dinkes Blora gelar vaksinasi massal di 10 desa terpencil. Target 5000 warga divaksin dalam satu minggu.',
+                author: 'RadarBlora',
+                time: '6j lalu',
+                likes: 456,
                 shares: 234,
-                location: 'Cepu'
+                location: 'Desa-desa Blora',
+                url: 'https://radarblora.co.id/vaksinasi-massal'
             }
         ];
 
         let currentFilter = 'all';
-        let feedData = [];
-        let autoUpdateInterval;
-        let countdownInterval;
-        let nextUpdateTime;
+        let currentSource = 'all';
+        let countdown = 900;
+        let timerInterval;
 
-        // Platform Icons (Unicode/Text)
-        const platformIcons = {
-            'X': 'X',
-            'Instagram': 'IG',
-            'Facebook': 'FB',
-            'TikTok': 'TT'
-        };
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('year').textContent = new Date().getFullYear();
-            loadData();
-            startAutoUpdate();
-        });
-
-        function loadData() {
-            // Simulate API call
-            setTimeout(() => {
-                // Generate random timestamps untuk simulasi real-time
-                feedData = dummyData.map(item => ({
-                    ...item,
-                    timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString()
-                }));
-                renderFeed();
-                updateStats();
-                updateTimestamp();
-            }, 800);
+        // INIT
+        function init() {
+            render();
+            updateStats();
+            updateCounts();
+            startTimer();
+            updateTimestamp();
         }
 
-        function renderFeed() {
-            const container = document.getElementById('feedContainer');
-            const filtered = currentFilter === 'all' 
-                ? feedData 
-                : feedData.filter(item => item.category === currentFilter);
+        // RENDER FEED
+        function render() {
+            const grid = document.getElementById('feedGrid');
+            
+            let filtered = feedData;
+            
+            // Filter by source
+            if (currentSource !== 'all') {
+                filtered = filtered.filter(item => item.source === currentSource);
+            }
+            
+            // Filter by category
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(item => item.category === currentFilter);
+            }
             
             if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">[]</div>
-                        <p>// Tidak ada data untuk kategori ini</p>
-                    </div>
-                `;
+                grid.innerHTML = '<div class="loading">Tidak ada data</div>';
                 return;
             }
             
-            // Sort by newest
-            const sorted = filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
-            container.innerHTML = sorted.map((item, index) => `
-                <article class="feed-card" style="animation-delay: ${index * 0.05}s">
-                    <div class="feed-header">
-                        <span class="platform-icon">[${platformIcons[item.platform]}]</span>
-                        <span class="category-badge category-${item.category}">${item.category}</span>
+            grid.innerHTML = filtered.map(item => {
+                const isMedia = item.source === 'media';
+                const platformClass = isMedia ? 'platform media' : 'platform';
+                const categoryClass = item.category === 'media' ? '' : item.category;
+                const categoryLabel = item.category === 'media' ? 'Liputan' : item.category;
+                
+                return `
+                <article class="feed-card">
+                    <div>
+                        <div class="card-header">
+                            <div class="source-badge">
+                                <span class="${platformClass}">${item.platform}</span>
+                                ${isMedia ? '<span class="media-source">Media Partner</span>' : ''}
+                            </div>
+                            <span class="category ${categoryClass}">${categoryLabel}</span>
+                        </div>
+                        <div class="content">${item.content}</div>
                     </div>
-                    <div class="feed-content">
-                        ${escapeHtml(item.content)}
-                    </div>
-                    <div class="feed-footer">
+                    <div class="card-footer">
                         <div>
-                            <div class="author">@${escapeHtml(item.author)}</div>
-                            <div class="timestamp">${formatDate(item.timestamp)} | ${escapeHtml(item.location)}</div>
+                            <div class="meta">@${item.author}</div>
+                            <div class="meta-detail">${item.time} | ${item.location}</div>
                         </div>
                         <div class="engagement">
-                            <span class="engagement-item">&lt;3 ${item.likes}</span>
-                            <span class="engagement-item">=&gt; ${item.shares}</span>
+                            <span>↑${item.likes}</span>
+                            <span>→${item.shares}</span>
                         </div>
                     </div>
                 </article>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function filterFeed(category, btn) {
+        // FILTER CATEGORY
+        function filterCategory(category, btn) {
             currentFilter = category;
-            
-            // Update buttons
-            document.querySelectorAll('.filter-group .btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-            
-            renderFeed();
+            document.querySelectorAll('.controls .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
         }
 
-        function manualRefresh() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.classList.add('spinning');
-            
-            document.getElementById('feedContainer').innerHTML = '<div class="loading">Memuat data terbaru</div>';
-            
-            // Reset timer
-            resetAutoUpdate();
-            
-            setTimeout(() => {
-                // Shuffle dan update timestamp untuk simulasi data baru
-                feedData = feedData.map(item => ({
-                    ...item,
-                    timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(),
-                    likes: item.likes + Math.floor(Math.random() * 10)
-                })).sort(() => Math.random() - 0.5);
-                
-                renderFeed();
-                updateStats();
-                updateTimestamp();
-                showNotification();
-                btn.classList.remove('spinning');
-            }, 1000);
+        // FILTER SOURCE
+        function filterSource(source, btn) {
+            currentSource = source;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            render();
         }
 
-        function startAutoUpdate() {
-            // Update setiap 15 menit (900000 ms)
-            nextUpdateTime = Date.now() + 900000;
-            updateCountdown();
+        // REFRESH
+        function refreshData() {
+            // Shuffle untuk simulasi update
+            feedData.sort(() => Math.random() - 0.5);
+            feedData.forEach(item => {
+                item.likes += Math.floor(Math.random() * 15);
+            });
             
-            countdownInterval = setInterval(updateCountdown, 1000);
-            
-            autoUpdateInterval = setInterval(() => {
-                performAutoUpdate();
-                nextUpdateTime = Date.now() + 900000;
-            }, 900000);
-        }
-
-        function resetAutoUpdate() {
-            clearInterval(autoUpdateInterval);
-            clearInterval(countdownInterval);
-            startAutoUpdate();
-        }
-
-        function performAutoUpdate() {
-            // Simulasi fetch data baru
-            feedData = feedData.map(item => ({
-                ...item,
-                likes: item.likes + Math.floor(Math.random() * 5),
-                timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString()
-            }));
-            
-            // Tambah data dummy baru sesekali
-            if(Math.random() > 0.7) {
-                const newPosts = generateNewPosts();
-                feedData = [...newPosts, ...feedData].slice(0, 20);
-            }
-            
-            renderFeed();
+            render();
             updateStats();
+            resetTimer();
             updateTimestamp();
-            showNotification();
         }
 
-        function generateNewPosts() {
-            const templates = [
-                { cat: 'kritik', text: 'Macet parah di pertigaan Blora kota setiap jam pulang kerja. Butuh pengaturan lalu lintas lebih baik.', loc: 'Pertigaan Blora' },
-                { cat: 'apresiasi', text: 'Layanan puskesmas di Kecamatan Banjarejo sangat memuaskan. Petugasnya ramah dan profesional.', loc: 'Banjarejo' },
-                { cat: 'kritik', text: 'Sinyal internet di desa-desa masih lemah. Sulit untuk akses pembelajaran online.', loc: 'Desa Blora' },
-                { cat: 'apresiasi', text: 'Panen tebu tahun ini melimpah! Terima kasih pendampingan dari Dinas Pertanian Blora.', loc: 'Kecamatan Jiken' }
-            ];
-            
-            const platforms = ['X', 'Instagram', 'Facebook', 'TikTok'];
-            const newPosts = [];
-            
-            for(let i=0; i<2; i++) {
-                const template = templates[Math.floor(Math.random() * templates.length)];
-                newPosts.push({
-                    id: Date.now() + i,
-                    platform: platforms[Math.floor(Math.random() * platforms.length)],
-                    category: template.cat,
-                    content: template.text,
-                    author: `warga_${Math.floor(Math.random()*1000)}`,
-                    timestamp: new Date().toISOString(),
-                    likes: Math.floor(Math.random() * 100),
-                    shares: Math.floor(Math.random() * 50),
-                    location: template.loc
-                });
-            }
-            return newPosts;
-        }
-
-        function updateCountdown() {
-            const now = Date.now();
-            const diff = nextUpdateTime - now;
-            
-            if(diff <= 0) {
-                document.getElementById('nextUpdate').textContent = 'Updating...';
-                return;
-            }
-            
-            const minutes = Math.floor(diff / 60000);
-            const seconds = Math.floor((diff % 60000) / 1000);
-            document.getElementById('nextUpdate').textContent = 
-                `Next: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function showNotification() {
-            const notif = document.getElementById('updateNotification');
-            notif.classList.add('show');
-            setTimeout(() => {
-                notif.classList.remove('show');
-            }, 3000);
-        }
-
+        // STATS
         function updateStats() {
             const kritik = feedData.filter(i => i.category === 'kritik').length;
             const apresiasi = feedData.filter(i => i.category === 'apresiasi').length;
+            const media = feedData.filter(i => i.source === 'media').length;
             
-            animateNumber('totalFeed', feedData.length);
-            animateNumber('totalKritik', kritik);
-            animateNumber('totalApresiasi', apresiasi);
+            document.getElementById('totalFeed').textContent = feedData.length;
+            document.getElementById('totalKritik').textContent = kritik;
+            document.getElementById('totalApresiasi').textContent = apresiasi;
+            document.getElementById('totalMedia').textContent = media;
         }
 
-        function animateNumber(id, target) {
-            const element = document.getElementById(id);
-            const duration = 800;
-            const start = parseInt(element.textContent) || 0;
-            const increment = (target - start) / (duration / 16);
-            let current = start;
+        // COUNTS
+        function updateCounts() {
+            const social = feedData.filter(i => i.source === 'social').length;
+            const media = feedData.filter(i => i.source === 'media').length;
             
-            const timer = setInterval(() => {
-                current += increment;
-                if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
-                    element.textContent = target;
-                    clearInterval(timer);
-                } else {
-                    element.textContent = Math.floor(current);
+            document.getElementById('countAll').textContent = feedData.length;
+            document.getElementById('countSocial').textContent = social;
+            document.getElementById('countMedia').textContent = media;
+        }
+
+        // TIMER
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    refreshData();
+                    countdown = 900;
                 }
-            }, 16);
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function resetTimer() {
+            countdown = 900;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(countdown / 60).toString().padStart(2, '0');
+            const s = (countdown % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `NEXT: ${m}:${s}`;
         }
 
         function updateTimestamp() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.getElementById('lastUpdate').textContent = timeString;
+            document.getElementById('lastUpdate').textContent = 
+                now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
         }
 
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
-            const now = new Date();
-            const diff = (now - date) / 1000;
-            
-            if (diff < 60) return 'baru saja';
-            if (diff < 3600) return `${Math.floor(diff / 60)}m lalu`;
-            if (diff < 86400) return `${Math.floor(diff / 3600)}j lalu`;
-            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-        }
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            clearInterval(autoUpdateInterval);
-            clearInterval(countdownInterval);
-        });
+        // Start
+        init();
     </script>
 </body>
 </html>
