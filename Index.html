@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blora Social Feed Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap');
+        /* Font Face Local Fallback */
+        @font-face {
+            font-family: 'Fira Code';
+            src: local('Consolas'), local('Monaco'), local('Courier New');
+            font-weight: 300 600;
+        }
         
         * {
             margin: 0;
@@ -25,7 +32,7 @@
         }
         
         body {
-            font-family: 'Fira Code', monospace;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
@@ -131,7 +138,7 @@
             border: 2px solid var(--text-primary);
             color: var(--text-primary);
             padding: 0.75rem 1.5rem;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -154,6 +161,12 @@
         
         .refresh-btn.spinning .icon {
             animation: spin 1s linear infinite;
+        }
+        
+        .next-update {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: 1rem;
         }
         
         /* Feed Grid */
@@ -207,6 +220,7 @@
         
         .platform-icon {
             font-size: 1.2rem;
+            font-weight: bold;
         }
         
         .category-badge {
@@ -270,6 +284,7 @@
             padding: 3rem;
             font-size: 0.9rem;
             color: var(--text-secondary);
+            grid-column: 1 / -1;
         }
         
         .loading::after {
@@ -290,6 +305,26 @@
             opacity: 0.3;
         }
         
+        /* Update Notification */
+        .update-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--text-primary);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease-out;
+            display: none;
+        }
+        
+        .update-notification.show {
+            display: block;
+        }
+        
         /* Footer */
         footer {
             background: var(--bg-secondary);
@@ -303,6 +338,11 @@
         /* Animations */
         @keyframes slideIn {
             from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
         
@@ -356,6 +396,7 @@
             .feed-container { grid-template-columns: 1fr; }
             .controls { flex-direction: column; align-items: stretch; }
             .filter-group { justify-content: center; }
+            .next-update { margin-left: 0; margin-top: 0.5rem; text-align: center; }
         }
         
         /* Scrollbar */
@@ -374,9 +415,13 @@
     </style>
 </head>
 <body>
+    <div class="update-notification" id="updateNotification">
+        Data diperbarui! [15 menit lagi]
+    </div>
+
     <header>
         <div class="header-content">
-            <div class="location-badge">📍 Kabupaten Blora, Jawa Tengah, Indonesia</div>
+            <div class="location-badge">Kabupaten Blora, Jawa Tengah, Indonesia</div>
             <h1>Social_Feed_Monitor_v1.0</h1>
             <p class="subtitle">// Monitoring kritik dan apresiasi masyarakat dari platform sosial media</p>
         </div>
@@ -405,14 +450,17 @@
     
     <div class="controls">
         <div class="filter-group">
-            <button class="btn active" onclick="filterFeed('all')">[Semua]</button>
-            <button class="btn" onclick="filterFeed('kritik')">[Kritik]</button>
-            <button class="btn" onclick="filterFeed('apresiasi')">[Apresiasi]</button>
+            <button class="btn active" onclick="filterFeed('all', this)">[Semua]</button>
+            <button class="btn" onclick="filterFeed('kritik', this)">[Kritik]</button>
+            <button class="btn" onclick="filterFeed('apresiasi', this)">[Apresiasi]</button>
         </div>
-        <button class="btn refresh-btn" onclick="refreshData()">
-            <span class="icon">↻</span>
-            <span>Refresh_Data()</span>
-        </button>
+        <div style="display: flex; align-items: center; flex-wrap: wrap;">
+            <button class="btn refresh-btn" onclick="manualRefresh()">
+                <span class="icon">*</span>
+                <span>Refresh_Data()</span>
+            </button>
+            <span class="next-update" id="nextUpdate">Next: 15:00</span>
+        </div>
     </div>
     
     <div class="feed-container" id="feedContainer">
@@ -421,19 +469,19 @@
     
     <footer>
         <p>// Sistem monitoring ini mengumpulkan data publik dari X, Instagram, TikTok, dan Facebook</p>
-        <p>Dikembangkan untuk Kabupaten Blora | {new Date().getFullYear()}</p>
+        <p>Dikembangkan untuk Kabupaten Blora | <span id="year"></span></p>
     </footer>
 
     <script>
-        // Data Feed Dummy untuk Demo
+        // Data Feed Dummy untuk Demo - Realistis untuk Blora
         const dummyData = [
             {
                 id: 1,
                 platform: 'X',
                 category: 'kritik',
                 content: 'Jalan raya Blora-Cepu banyak lubang, sudah berbulan-bulan tidak diperbaiki. Bahaya untuk pengendara motor. Mohon perhatiannya @PemkabBlora #Blora',
-                author: '@warga_blora',
-                timestamp: '2026-02-20T10:30:00',
+                author: 'warga_blora',
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
                 likes: 45,
                 shares: 23,
                 location: 'Jl. Raya Blora-Cepu'
@@ -442,9 +490,9 @@
                 id: 2,
                 platform: 'Instagram',
                 category: 'apresiasi',
-                content: 'Alhamdulillah pasar tradisional Jepon sudah direnovasi, jadi lebih bersih dan nyaman. Terima kasih Pak Bupati! 🙏 #BloraHebat',
+                content: 'Alhamdulillah pasar tradisional Jepon sudah direnovasi, jadi lebih bersih dan nyaman. Terima kasih Pak Bupati! #BloraHebat',
                 author: 'jepon_makmur',
-                timestamp: '2026-02-20T09:15:00',
+                timestamp: new Date(Date.now() - 7200000).toISOString(),
                 likes: 234,
                 shares: 45,
                 location: 'Pasar Jepon'
@@ -455,7 +503,7 @@
                 category: 'kritik',
                 content: 'Sampah di sungai Bengawan Solo sekitar Randublatung menggunung. Pembersihan tidak rutin. Ini mengganggu kesehatan lingkungan.',
                 author: 'Peduli Blora',
-                timestamp: '2026-02-19T16:45:00',
+                timestamp: new Date(Date.now() - 10800000).toISOString(),
                 likes: 67,
                 shares: 89,
                 location: 'Randublatung'
@@ -464,9 +512,9 @@
                 id: 4,
                 platform: 'TikTok',
                 category: 'apresiasi',
-                content: 'Festival Blora 2026 keren banget! Ada wayang kulit, pameran UKM, dan konser dangdut. Bangga jadi warga Blora! 🎉',
-                author: '@blora_culture',
-                timestamp: '2026-02-20T08:00:00',
+                content: 'Festival Blora 2026 keren banget! Ada wayang kulit, pameran UKM, dan konser dangdut. Bangga jadi warga Blora!',
+                author: 'blora_culture',
+                timestamp: new Date(Date.now() - 14400000).toISOString(),
                 likes: 1205,
                 shares: 340,
                 location: 'Alun-alun Blora'
@@ -476,8 +524,8 @@
                 platform: 'X',
                 category: 'kritik',
                 content: 'Pelayanan di Dukcapil Blora masih lambat. Antrian panjang padahal sudah online. Sistem perlu diperbaiki.',
-                author: '@antrian_blora',
-                timestamp: '2026-02-19T14:20:00',
+                author: 'antrian_blora',
+                timestamp: new Date(Date.now() - 18000000).toISOString(),
                 likes: 34,
                 shares: 12,
                 location: 'Kantor Dukcapil Blora'
@@ -486,9 +534,9 @@
                 id: 6,
                 platform: 'Instagram',
                 category: 'apresiasi',
-                content: 'Taman Kota Blora malam ini indah sekali. Lampu-lampu baru terpasang rapi. Cocok untuk keluarga berwisata malam. 📸✨',
+                content: 'Taman Kota Blora malam ini indah sekali. Lampu-lampu baru terpasang rapi. Cocok untuk keluarga berwisata malam.',
                 author: 'blora_night',
-                timestamp: '2026-02-20T19:30:00',
+                timestamp: new Date(Date.now() - 21600000).toISOString(),
                 likes: 456,
                 shares: 78,
                 location: 'Taman Kota Blora'
@@ -499,7 +547,7 @@
                 category: 'kritik',
                 content: 'Ketersediaan air bersih di Kecamatan Todanan masih bermasalah. PDAM sering mati tanpa pemberitahuan. Mohon solusinya.',
                 author: 'Warga Todanan',
-                timestamp: '2026-02-18T11:00:00',
+                timestamp: new Date(Date.now() - 25200000).toISOString(),
                 likes: 123,
                 shares: 56,
                 location: 'Todanan'
@@ -508,9 +556,9 @@
                 id: 8,
                 platform: 'TikTok',
                 category: 'apresiasi',
-                content: 'SMK Negeri 1 Blora juara robotik tingkat nasional! Prestasi membanggakan untuk pendidikan vokasi di Blora. 🤖🏆',
-                author: '@smkn1_blora',
-                timestamp: '2026-02-20T12:00:00',
+                content: 'SMK Negeri 1 Blora juara robotik tingkat nasional! Prestasi membanggakan untuk pendidikan vokasi di Blora.',
+                author: 'smkn1_blora',
+                timestamp: new Date(Date.now() - 28800000).toISOString(),
                 likes: 3400,
                 shares: 890,
                 location: 'SMKN 1 Blora'
@@ -520,8 +568,8 @@
                 platform: 'X',
                 category: 'kritik',
                 content: 'Lampu jalan di Jl. Pemuda Blora banyak yang mati. Jadi gelap dan rawan kecelakaan. Perlu perbaikan segera.',
-                author: '@pemuda_blora',
-                timestamp: '2026-02-19T20:15:00',
+                author: 'pemuda_blora',
+                timestamp: new Date(Date.now() - 32400000).toISOString(),
                 likes: 89,
                 shares: 34,
                 location: 'Jl. Pemuda, Blora'
@@ -530,39 +578,70 @@
                 id: 10,
                 platform: 'Instagram',
                 category: 'apresiasi',
-                content: 'Sentra kerajinan batik Blora semakin berkembang. Kualitas bagus dan harga terjangkau. Dukung UMKM lokal! 🎨',
+                content: 'Sentra kerajinan batik Blora semakin berkembang. Kualitas bagus dan harga terjangkau. Dukung UMKM lokal!',
                 author: 'batik_blora',
-                timestamp: '2026-02-20T15:45:00',
+                timestamp: new Date(Date.now() - 36000000).toISOString(),
                 likes: 567,
                 shares: 123,
                 location: 'Sentra Batik Blora'
+            },
+            {
+                id: 11,
+                platform: 'Facebook',
+                category: 'kritik',
+                content: 'Jembatan di Desa Jiken rusak parah. Warga harus memutar jauh untuk ke kecamatan. Butuh perhatian pemerintah.',
+                author: 'Jiken_Bangkit',
+                timestamp: new Date(Date.now() - 40000000).toISOString(),
+                likes: 156,
+                shares: 234,
+                location: 'Desa Jiken'
+            },
+            {
+                id: 12,
+                platform: 'TikTok',
+                category: 'apresiasi',
+                content: 'Pemandian air panas Cepu ramai pengunjung! Fasilitasnya bersih dan harga tiket terjangkau. Wisata Blora memang oke.',
+                author: 'wisata_blora',
+                timestamp: new Date(Date.now() - 43200000).toISOString(),
+                likes: 890,
+                shares: 234,
+                location: 'Cepu'
             }
         ];
 
         let currentFilter = 'all';
         let feedData = [];
+        let autoUpdateInterval;
+        let countdownInterval;
+        let nextUpdateTime;
 
-        // Platform Icons
+        // Platform Icons (Unicode/Text)
         const platformIcons = {
-            'X': '𝕏',
-            'Instagram': '📷',
-            'Facebook': 'f',
-            'TikTok': '🎵'
+            'X': 'X',
+            'Instagram': 'IG',
+            'Facebook': 'FB',
+            'TikTok': 'TT'
         };
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('year').textContent = new Date().getFullYear();
             loadData();
+            startAutoUpdate();
         });
 
         function loadData() {
             // Simulate API call
             setTimeout(() => {
-                feedData = dummyData;
+                // Generate random timestamps untuk simulasi real-time
+                feedData = dummyData.map(item => ({
+                    ...item,
+                    timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString()
+                }));
                 renderFeed();
                 updateStats();
                 updateTimestamp();
-            }, 1000);
+            }, 800);
         }
 
         function renderFeed() {
@@ -574,62 +653,168 @@
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📭</div>
+                        <div class="empty-icon">[]</div>
                         <p>// Tidak ada data untuk kategori ini</p>
                     </div>
                 `;
                 return;
             }
             
-            container.innerHTML = filtered.map((item, index) => `
-                <article class="feed-card" style="animation-delay: ${index * 0.1}s">
+            // Sort by newest
+            const sorted = filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            container.innerHTML = sorted.map((item, index) => `
+                <article class="feed-card" style="animation-delay: ${index * 0.05}s">
                     <div class="feed-header">
-                        <span class="platform-icon">${platformIcons[item.platform]}</span>
+                        <span class="platform-icon">[${platformIcons[item.platform]}]</span>
                         <span class="category-badge category-${item.category}">${item.category}</span>
                     </div>
                     <div class="feed-content">
-                        ${item.content}
+                        ${escapeHtml(item.content)}
                     </div>
                     <div class="feed-footer">
                         <div>
-                            <div class="author">@${item.author}</div>
-                            <div class="timestamp">${formatDate(item.timestamp)} • ${item.location}</div>
+                            <div class="author">@${escapeHtml(item.author)}</div>
+                            <div class="timestamp">${formatDate(item.timestamp)} | ${escapeHtml(item.location)}</div>
                         </div>
                         <div class="engagement">
-                            <span class="engagement-item">♥ ${item.likes}</span>
-                            <span class="engagement-item">↗ ${item.shares}</span>
+                            <span class="engagement-item">&lt;3 ${item.likes}</span>
+                            <span class="engagement-item">=&gt; ${item.shares}</span>
                         </div>
                     </div>
                 </article>
             `).join('');
         }
 
-        function filterFeed(category) {
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function filterFeed(category, btn) {
             currentFilter = category;
             
             // Update buttons
-            document.querySelectorAll('.filter-group .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            document.querySelectorAll('.filter-group .btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
             
             renderFeed();
         }
 
-        function refreshData() {
+        function manualRefresh() {
             const btn = document.querySelector('.refresh-btn');
             btn.classList.add('spinning');
             
             document.getElementById('feedContainer').innerHTML = '<div class="loading">Memuat data terbaru</div>';
             
+            // Reset timer
+            resetAutoUpdate();
+            
             setTimeout(() => {
-                // Shuffle data untuk simulasi update
-                feedData = [...feedData].sort(() => Math.random() - 0.5);
+                // Shuffle dan update timestamp untuk simulasi data baru
+                feedData = feedData.map(item => ({
+                    ...item,
+                    timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+                    likes: item.likes + Math.floor(Math.random() * 10)
+                })).sort(() => Math.random() - 0.5);
+                
                 renderFeed();
                 updateStats();
                 updateTimestamp();
+                showNotification();
                 btn.classList.remove('spinning');
-            }, 1500);
+            }, 1000);
+        }
+
+        function startAutoUpdate() {
+            // Update setiap 15 menit (900000 ms)
+            nextUpdateTime = Date.now() + 900000;
+            updateCountdown();
+            
+            countdownInterval = setInterval(updateCountdown, 1000);
+            
+            autoUpdateInterval = setInterval(() => {
+                performAutoUpdate();
+                nextUpdateTime = Date.now() + 900000;
+            }, 900000);
+        }
+
+        function resetAutoUpdate() {
+            clearInterval(autoUpdateInterval);
+            clearInterval(countdownInterval);
+            startAutoUpdate();
+        }
+
+        function performAutoUpdate() {
+            // Simulasi fetch data baru
+            feedData = feedData.map(item => ({
+                ...item,
+                likes: item.likes + Math.floor(Math.random() * 5),
+                timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString()
+            }));
+            
+            // Tambah data dummy baru sesekali
+            if(Math.random() > 0.7) {
+                const newPosts = generateNewPosts();
+                feedData = [...newPosts, ...feedData].slice(0, 20);
+            }
+            
+            renderFeed();
+            updateStats();
+            updateTimestamp();
+            showNotification();
+        }
+
+        function generateNewPosts() {
+            const templates = [
+                { cat: 'kritik', text: 'Macet parah di pertigaan Blora kota setiap jam pulang kerja. Butuh pengaturan lalu lintas lebih baik.', loc: 'Pertigaan Blora' },
+                { cat: 'apresiasi', text: 'Layanan puskesmas di Kecamatan Banjarejo sangat memuaskan. Petugasnya ramah dan profesional.', loc: 'Banjarejo' },
+                { cat: 'kritik', text: 'Sinyal internet di desa-desa masih lemah. Sulit untuk akses pembelajaran online.', loc: 'Desa Blora' },
+                { cat: 'apresiasi', text: 'Panen tebu tahun ini melimpah! Terima kasih pendampingan dari Dinas Pertanian Blora.', loc: 'Kecamatan Jiken' }
+            ];
+            
+            const platforms = ['X', 'Instagram', 'Facebook', 'TikTok'];
+            const newPosts = [];
+            
+            for(let i=0; i<2; i++) {
+                const template = templates[Math.floor(Math.random() * templates.length)];
+                newPosts.push({
+                    id: Date.now() + i,
+                    platform: platforms[Math.floor(Math.random() * platforms.length)],
+                    category: template.cat,
+                    content: template.text,
+                    author: `warga_${Math.floor(Math.random()*1000)}`,
+                    timestamp: new Date().toISOString(),
+                    likes: Math.floor(Math.random() * 100),
+                    shares: Math.floor(Math.random() * 50),
+                    location: template.loc
+                });
+            }
+            return newPosts;
+        }
+
+        function updateCountdown() {
+            const now = Date.now();
+            const diff = nextUpdateTime - now;
+            
+            if(diff <= 0) {
+                document.getElementById('nextUpdate').textContent = 'Updating...';
+                return;
+            }
+            
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            document.getElementById('nextUpdate').textContent = 
+                `Next: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showNotification() {
+            const notif = document.getElementById('updateNotification');
+            notif.classList.add('show');
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
         }
 
         function updateStats() {
@@ -643,7 +828,7 @@
 
         function animateNumber(id, target) {
             const element = document.getElementById(id);
-            const duration = 1000;
+            const duration = 800;
             const start = parseInt(element.textContent) || 0;
             const increment = (target - start) / (duration / 16);
             let current = start;
@@ -663,7 +848,8 @@
             const now = new Date();
             const timeString = now.toLocaleTimeString('id-ID', { 
                 hour: '2-digit', 
-                minute: '2-digit' 
+                minute: '2-digit',
+                second: '2-digit'
             });
             document.getElementById('lastUpdate').textContent = timeString;
         }
@@ -671,24 +857,19 @@
         function formatDate(timestamp) {
             const date = new Date(timestamp);
             const now = new Date();
-            const diff = (now - date) / 1000; // seconds
+            const diff = (now - date) / 1000;
             
-            if (diff < 3600) {
-                return `${Math.floor(diff / 60)}m lalu`;
-            } else if (diff < 86400) {
-                return `${Math.floor(diff / 3600)}j lalu`;
-            } else {
-                return date.toLocaleDateString('id-ID', { 
-                    day: 'numeric', 
-                    month: 'short' 
-                });
-            }
+            if (diff < 60) return 'baru saja';
+            if (diff < 3600) return `${Math.floor(diff / 60)}m lalu`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}j lalu`;
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
         }
 
-        // Auto refresh setiap 5 menit
-        setInterval(() => {
-            refreshData();
-        }, 300000);
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            clearInterval(autoUpdateInterval);
+            clearInterval(countdownInterval);
+        });
     </script>
 </body>
 </html>
